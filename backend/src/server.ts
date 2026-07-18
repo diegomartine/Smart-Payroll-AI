@@ -1,7 +1,7 @@
 import app from "./app";
 
-const PORT = 3000;
+import { env } from "./config/env";
 
-app.listen(PORT, () => {
-    console.log(`🚀 Smart Payroll AI ejecutándose en el puerto ${PORT}`);
+app.listen(env.PORT, () => {
+    console.log(`🚀 Smart Payroll AI ejecutándose en el puerto ${env.PORT}`);
 });

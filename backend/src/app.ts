@@ -1,15 +1,10 @@
 import express from "express";
+import routes from "./routes";
 
 const app = express();
 
 app.use(express.json());
 
-app.get("/", (req, res) => {
-    res.status(200).json({
-        message: "Smart Payroll AI API",
-        version: "1.0.0",
-        status: "running"
-    });
-});
+app.use(routes);
 
 export default app;
