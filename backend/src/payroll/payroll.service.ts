@@ -50,4 +50,32 @@ export class PayrollService {
       where: { id },
     });
   }
+  addEmployee(payrollId: number, employeeId: number) {
+    return this.prisma.payrollEmployee.create({
+      data: {
+        payrollId,
+        employeeId,
+      },
+    });
+  }
+  findEmployees(payrollId: number) {
+    return this.prisma.payrollEmployee.findMany({
+      where: {
+        payrollId,
+      },
+      include: {
+        employee: true,
+      },
+    });
+  }
+  removeEmployee(payrollId: number, employeeId: number) {
+    return this.prisma.payrollEmployee.delete({
+      where: {
+        payrollId_employeeId: {
+          payrollId,
+          employeeId,
+        },
+      },
+    });
+  }
 }

@@ -28,29 +28,41 @@ enum PayrollStatus {
 }
 
 model Employee {
-  id               Int              @id @default(autoincrement())
-  employeeCode     String           @unique
+  id               Int               @id @default(autoincrement())
+  employeeCode     String            @unique
   documentType     DocumentType
-  documentNumber   String           @unique
+  documentNumber   String            @unique
   firstName        String
   lastName         String
-  email            String?          @unique
+  email            String?           @unique
   phone            String?
   position         String
   department       String
-  baseSalary       Decimal          @db.Decimal(12, 2)
+  baseSalary       Decimal           @db.Decimal(12, 2)
   hireDate         DateTime
-  employmentStatus EmploymentStatus @default(ACTIVE)
-  createdAt        DateTime         @default(now())
-  updatedAt        DateTime         @updatedAt
+  employmentStatus EmploymentStatus  @default(ACTIVE)
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  payrolls         PayrollEmployee[]
 }
 
 model Payroll {
-  id        Int           @id @default(autoincrement())
+  id        Int               @id @default(autoincrement())
   period    String
   startDate DateTime
   endDate   DateTime
-  status    PayrollStatus @default(DRAFT)
-  createdAt DateTime      @default(now())
-  updatedAt DateTime      @updatedAt
+  status    PayrollStatus     @default(DRAFT)
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+  employees PayrollEmployee[]
+}
+
+model PayrollEmployee {
+  id Int @id @default(autoincrement())
+  payrollId  Int
+  employeeId Int
+  payroll  Payroll  @relation(fields: [payrollId], references: [id])
+  employee Employee @relation(fields: [employeeId], references: [id])
+  createdAt DateTime @default(now())
+  @@unique([payrollId, employeeId])
 }

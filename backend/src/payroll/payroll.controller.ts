@@ -10,6 +10,7 @@ import {
 import { PayrollService } from './payroll.service';
 import { CreatePayrollDto } from './dto/create-payroll.dto';
 import { UpdatePayrollDto } from './dto/update-payroll.dto';
+import { AddEmployeeToPayrollDto } from './dto/add-employee-to-payroll.dto';
 import { Payroll } from '../../generated/prisma/client';
 
 @Controller('payroll')
@@ -38,5 +39,20 @@ export class PayrollController {
   @Delete(':id')
   remove(@Param('id') id: string): Promise<Payroll> {
     return this.payrollService.remove(Number(id));
+  }
+  @Post(':id/employees')
+  addEmployee(@Param('id') id: string, @Body() dto: AddEmployeeToPayrollDto) {
+    return this.payrollService.addEmployee(Number(id), dto.employeeId);
+  }
+  @Get(':id/employees')
+  findEmployees(@Param('id') id: string) {
+    return this.payrollService.findEmployees(Number(id));
+  }
+  @Delete(':id/employees/:employeeId')
+  removeEmployee(
+    @Param('id') id: string,
+    @Param('employeeId') employeeId: string,
+  ) {
+    return this.payrollService.removeEmployee(Number(id), Number(employeeId));
   }
 }
