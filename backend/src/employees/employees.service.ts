@@ -1,6 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateEmployeeDto } from './dto/create-employee.dto';
+import { UpdateEmployeeDto } from './dto/update-employee.dto';
 
 @Injectable()
 export class EmployeesService {
@@ -17,7 +18,24 @@ export class EmployeesService {
   }
 
   async findOne(id: number) {
-    return this.prisma.employee.findUnique({
+    const employee = await this.prisma.employee.findUnique({
+      where: { id },
+    });
+
+    if (!employee) {
+      throw new NotFoundException(`Employee with ID ${id} not found`);
+    }
+
+    return employee;
+  }
+  async update(id: number, updateEmployeeDto: UpdateEmployeeDto) {
+    return this.prisma.employee.update({
+      where: { id },
+      data: updateEmployeeDto,
+    });
+  }
+  async remove(id: number) {
+    return this.prisma.employee.delete({
       where: { id },
     });
   }
