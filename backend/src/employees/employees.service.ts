@@ -11,4 +11,8 @@ export class EmployeesService {
       data: createEmployeeDto,
     });
   }
+
+  async findAll() {
+    return this.prisma.employee.findMany();
+  }
 }
