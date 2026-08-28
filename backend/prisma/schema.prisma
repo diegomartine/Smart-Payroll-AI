@@ -27,6 +27,19 @@ enum PayrollStatus {
   CANCELLED
 }
 
+enum PayrollNoveltyType {
+  OVERTIME
+  BONUS
+  COMMISSION
+  ALLOWANCE
+  DEDUCTION
+  ABSENCE
+  SICK_LEAVE
+  VACATION
+  OTHER_EARNING
+  OTHER_DEDUCTION
+}
+
 model Employee {
   id               Int               @id @default(autoincrement())
   employeeCode     String            @unique
@@ -58,11 +71,31 @@ model Payroll {
 }
 
 model PayrollEmployee {
-  id Int @id @default(autoincrement())
+  id         Int @id @default(autoincrement())
   payrollId  Int
   employeeId Int
+
   payroll  Payroll  @relation(fields: [payrollId], references: [id])
   employee Employee @relation(fields: [employeeId], references: [id])
+
+  novelties PayrollNovelty[]
+
   createdAt DateTime @default(now())
+
   @@unique([payrollId, employeeId])
+}
+
+model PayrollNovelty {
+  id                Int                @id @default(autoincrement())
+  payrollEmployeeId Int
+  type              PayrollNoveltyType
+  description       String?
+  quantity          Decimal?           @db.Decimal(10, 2)
+  amount            Decimal            @db.Decimal(12, 2)
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+
+  payrollEmployee PayrollEmployee @relation(fields: [payrollEmployeeId], references: [id])
+
+  @@index([payrollEmployeeId])
 }
