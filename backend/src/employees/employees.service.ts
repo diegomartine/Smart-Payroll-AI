@@ -15,4 +15,10 @@ export class EmployeesService {
   async findAll() {
     return this.prisma.employee.findMany();
   }
+
+  async findOne(id: number) {
+    return this.prisma.employee.findUnique({
+      where: { id },
+    });
+  }
 }
