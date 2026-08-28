@@ -20,20 +20,37 @@ enum DocumentType {
   NIT
 }
 
+enum PayrollStatus {
+  DRAFT
+  PROCESSING
+  COMPLETED
+  CANCELLED
+}
+
 model Employee {
-  id                Int                @id @default(autoincrement())
-  employeeCode      String             @unique
-  documentType      DocumentType
-  documentNumber    String             @unique
-  firstName         String
-  lastName          String
-  email             String?            @unique
-  phone             String?
-  position          String
-  department        String
-  baseSalary        Decimal @db.Decimal(12,2)
-  hireDate          DateTime
-  employmentStatus  EmploymentStatus   @default(ACTIVE)
-  createdAt         DateTime           @default(now())
-  updatedAt         DateTime           @updatedAt
+  id               Int              @id @default(autoincrement())
+  employeeCode     String           @unique
+  documentType     DocumentType
+  documentNumber   String           @unique
+  firstName        String
+  lastName         String
+  email            String?          @unique
+  phone            String?
+  position         String
+  department       String
+  baseSalary       Decimal          @db.Decimal(12, 2)
+  hireDate         DateTime
+  employmentStatus EmploymentStatus @default(ACTIVE)
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+}
+
+model Payroll {
+  id        Int           @id @default(autoincrement())
+  period    String
+  startDate DateTime
+  endDate   DateTime
+  status    PayrollStatus @default(DRAFT)
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
 }
