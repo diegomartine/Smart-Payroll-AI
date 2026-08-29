@@ -75,7 +75,9 @@ export class PayrollService {
       },
     });
   }
-  removeEmployee(payrollId: number, employeeId: number) {
+  async removeEmployee(payrollId: number, employeeId: number) {
+    await this.validatePayrollEditable(payrollId);
+
     return this.prisma.payrollEmployee.delete({
       where: {
         payrollId_employeeId: {
