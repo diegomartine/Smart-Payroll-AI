@@ -4,6 +4,7 @@ import {
   IsEnum,
   IsNumber,
   IsOptional,
+  IsPositive,
   IsString,
 } from 'class-validator';
 
@@ -36,13 +37,16 @@ export class CreateEmployeeDto {
   @IsString()
   phone?: string;
 
-  @IsString()
-  position!: string;
-
-  @IsString()
-  department!: string;
+  @IsNumber()
+  @IsPositive()
+  departmentId!: number;
 
   @IsNumber()
+  @IsPositive()
+  positionId!: number;
+
+  @IsNumber()
+  @IsPositive()
   baseSalary!: number;
 
   @IsDateString()

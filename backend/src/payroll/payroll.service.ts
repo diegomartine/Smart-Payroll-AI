@@ -274,9 +274,22 @@ export class PayrollService {
       );
     }
 
-    let totalEarnings = new Prisma.Decimal(payrollEmployee.employee.baseSalary);
+    const baseSalary = new Prisma.Decimal(
+      payrollEmployee.baseSalary ?? payrollEmployee.employee.baseSalary,
+    );
+
+    let totalEarnings = baseSalary
+      .plus(payrollEmployee.overtimeValue ?? 0)
+      .plus(payrollEmployee.bonus ?? 0)
+      .plus(payrollEmployee.transportAllowance ?? 0)
+      .plus(payrollEmployee.otherIncome ?? 0);
 
     let totalDeductions = new Prisma.Decimal(0);
+
+    totalDeductions = totalDeductions
+      .plus(payrollEmployee.healthDeduction ?? 0)
+      .plus(payrollEmployee.pensionDeduction ?? 0)
+      .plus(payrollEmployee.otherDeductions ?? 0);
 
     for (const novelty of payrollEmployee.novelties) {
       if (
@@ -294,6 +307,15 @@ export class PayrollService {
 
     const netPay = totalEarnings.minus(totalDeductions);
 
+    await this.prisma.payrollEmployee.update({
+      where: {
+        id: payrollEmployeeId,
+      },
+      data: {
+        netSalary: netPay,
+      },
+    });
+
     return {
       payrollEmployeeId,
       employee: {
@@ -301,7 +323,19 @@ export class PayrollService {
         employeeCode: payrollEmployee.employee.employeeCode,
         name: `${payrollEmployee.employee.firstName} ${payrollEmployee.employee.lastName}`,
       },
-      baseSalary: payrollEmployee.employee.baseSalary,
+      payroll: {
+        workedDays: payrollEmployee.workedDays,
+        baseSalary,
+        overtimeHours: payrollEmployee.overtimeHours,
+        overtimeValue: payrollEmployee.overtimeValue,
+        bonus: payrollEmployee.bonus,
+        transportAllowance: payrollEmployee.transportAllowance,
+        otherIncome: payrollEmployee.otherIncome,
+        healthDeduction: payrollEmployee.healthDeduction,
+        pensionDeduction: payrollEmployee.pensionDeduction,
+        otherDeductions: payrollEmployee.otherDeductions,
+      },
+      novelties: payrollEmployee.novelties,
       totalEarnings,
       totalDeductions,
       netPay,
