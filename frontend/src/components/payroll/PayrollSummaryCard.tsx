@@ -43,7 +43,7 @@ export function PayrollSummaryCard({ payrollEmployees }: PayrollSummaryCardProps
         if (!active) return;
         const sum = results.reduce<Totals>(
           (acc, r) => ({
-            baseSalary: acc.baseSalary + Number(r.baseSalary),
+            baseSalary: acc.baseSalary + Number(r.payroll.baseSalary),
             totalEarnings: acc.totalEarnings + Number(r.totalEarnings),
             totalDeductions: acc.totalDeductions + Number(r.totalDeductions),
             netPay: acc.netPay + Number(r.netPay),

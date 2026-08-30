@@ -7,6 +7,9 @@ import { EmployeeDetailPage } from './pages/employees/EmployeeDetailPage';
 import { PayrollListPage } from './pages/payroll/PayrollListPage';
 import { PayrollFormPage } from './pages/payroll/PayrollFormPage';
 import { PayrollDetailPage } from './pages/payroll/PayrollDetailPage';
+import { PositionsListPage } from './pages/positions/PositionsListPage';
+import { ImportEmployeesPage } from './pages/imports/ImportEmployeesPage';
+import { AnalysisPage } from './pages/analysis/AnalysisPage';
 import { NotFoundPage } from './pages/NotFoundPage';
 
 export function App() {
@@ -21,12 +24,18 @@ export function App() {
         <Route path="/employees/:id" element={<EmployeeDetailPage />} />
         <Route path="/employees/:id/edit" element={<EmployeeFormPage />} />
 
+        <Route path="/positions" element={<PositionsListPage />} />
+
         <Route path="/payroll" element={<PayrollListPage />} />
         <Route path="/payroll/new" element={<PayrollFormPage />} />
         <Route path="/payroll/:id" element={<PayrollDetailPage />} />
+
+        <Route path="/imports" element={<ImportEmployeesPage />} />
+        <Route path="/analysis" element={<AnalysisPage />} />
 
         <Route path="*" element={<NotFoundPage />} />
       </Route>
     </Routes>
   );
 }
+

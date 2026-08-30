@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { Pencil, Trash2, UserPlus, Users2, X } from 'lucide-react';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Pencil, Trash2, UserPlus, Users2, X, Sparkles, Download } from 'lucide-react';
 import { payrollApi } from '../../api/payroll.api';
+import { pdfApi } from '../../api/pdf.api';
 import type { Payroll, PayrollEmployee, PayrollStatus, UpdatePayrollPayload } from '../../types/payroll.types';
 import { PageHeader } from '../../components/ui/PageHeader';
 import { Loading } from '../../components/ui/Loading';
@@ -13,7 +14,7 @@ import { PayrollEmployeePanel } from '../../components/payroll/PayrollEmployeePa
 import { PayrollSummaryCard } from '../../components/payroll/PayrollSummaryCard';
 import { formatDate } from '../../utils/date';
 import { payrollStatusLabels, validPayrollStatusTransitions } from '../../utils/labels';
-import { getErrorMessage } from '../../utils/errors';
+import { getErrorMessage, getBlobErrorMessage } from '../../utils/errors';
 import { useToast } from '../../hooks/useToast';
 import { useConfirm } from '../../hooks/useConfirm';
 
@@ -31,6 +32,7 @@ export function PayrollDetailPage() {
   const [addModalOpen, setAddModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [changingStatus, setChangingStatus] = useState(false);
+  const [downloadingPdf, setDownloadingPdf] = useState(false);
 
   const loadAll = () => {
     setLoading(true);
@@ -134,6 +136,17 @@ export function PayrollDetailPage() {
     }
   };
 
+  const handleDownloadAllPdf = async () => {
+    setDownloadingPdf(true);
+    try {
+      await pdfApi.downloadPayroll(payrollId);
+    } catch (err) {
+      showToast(await getBlobErrorMessage(err), 'error');
+    } finally {
+      setDownloadingPdf(false);
+    }
+  };
+
   return (
     <div className="stack">
       <PageHeader
@@ -143,6 +156,14 @@ export function PayrollDetailPage() {
         backLabel="Volver a nóminas"
         actions={
           <>
+            <Link to={`/analysis?payrollId=${payrollId}`} className="btn btn-secondary">
+              <Sparkles size={15} /> Ver análisis
+            </Link>
+            {payrollEmployees.length > 0 && (
+              <button className="btn btn-secondary" disabled={downloadingPdf} onClick={handleDownloadAllPdf}>
+                <Download size={15} /> {downloadingPdf ? 'Generando…' : 'Descargar todos (PDF)'}
+              </button>
+            )}
             <button className="btn btn-secondary" onClick={() => setEditModalOpen(true)}>
               <Pencil size={15} /> Editar
             </button>
@@ -239,7 +260,7 @@ export function PayrollDetailPage() {
                     <td className="cell-primary">
                       {pe.employee.firstName} {pe.employee.lastName}
                     </td>
-                    <td className="cell-muted">{pe.employee.position}</td>
+                    <td className="cell-muted">{pe.employee.position?.name ?? 'Sin cargo'}</td>
                     <td>
                       <div className="row-actions" onClick={(e) => e.stopPropagation()}>
                         <button

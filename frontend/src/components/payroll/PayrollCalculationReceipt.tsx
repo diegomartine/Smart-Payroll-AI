@@ -12,19 +12,27 @@ interface PayrollCalculationReceiptProps {
  *
  * Nota: `totalEarnings` del backend YA incluye el salario base (ver
  * payroll.service.ts -> calculatePayrollEmployee: totalEarnings arranca en
- * baseSalary y luego suma las novedades de tipo devengado). Por eso el
- * salario base se muestra como referencia, no como una fila que se suma
- * aparte de "Total devengado" — evita que la resta visual (Total devengado
- * − Deducciones = Total neto) parezca no cuadrar.
+ * `payroll.baseSalary` y luego suma horas extra, bono, auxilio de
+ * transporte, otros ingresos y las novedades de tipo devengado). Por eso
+ * el salario base se muestra como referencia, no como una fila que se
+ * suma aparte de "Total devengado" — evita que la resta visual (Total
+ * devengado − Deducciones = Total neto) parezca no cuadrar.
  */
 export function PayrollCalculationReceipt({ calculation }: PayrollCalculationReceiptProps) {
+  const { payroll } = calculation;
   return (
     <div className="ledger-receipt">
       <div className="ledger-receipt-title">Cálculo de nómina · {calculation.employee.employeeCode}</div>
 
+      {payroll.workedDays !== null && (
+        <div className="ledger-row">
+          <span className="ledger-row-label">Días trabajados</span>
+          <span className="ledger-row-value">{payroll.workedDays}</span>
+        </div>
+      )}
       <div className="ledger-row">
         <span className="ledger-row-label">Salario base (referencia)</span>
-        <span className="ledger-row-value">{formatCOP(calculation.baseSalary)}</span>
+        <span className="ledger-row-value">{formatCOP(payroll.baseSalary)}</span>
       </div>
       <div className="ledger-row">
         <span className="ledger-row-label">Total devengado</span>

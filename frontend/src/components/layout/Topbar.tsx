@@ -4,7 +4,10 @@ import { Menu } from 'lucide-react';
 const sectionNames: Record<string, string> = {
   dashboard: 'Dashboard',
   employees: 'Empleados',
+  positions: 'Cargos',
   payroll: 'Nóminas',
+  imports: 'Importar Excel',
+  analysis: 'Análisis',
 };
 
 interface TopbarProps {

@@ -25,3 +25,26 @@ export function getErrorMessage(err: unknown): string {
 
   return 'Ocurrió un error inesperado.';
 }
+
+/**
+ * Igual que `getErrorMessage`, pero para llamadas con `responseType: 'blob'`
+ * (las descargas de PDF). Cuando el backend responde con un error, Axios
+ * entrega igual un Blob (no el JSON `{message,...}` esperado) porque el
+ * responseType ya quedó fijado en la petición, así que hay que leerlo como
+ * texto y parsearlo antes de mostrarlo.
+ */
+export async function getBlobErrorMessage(err: unknown): Promise<string> {
+  if (isAxiosError(err) && err.response?.data instanceof Blob) {
+    try {
+      const text = await err.response.data.text();
+      const parsed = JSON.parse(text) as ApiErrorPayload;
+      if (parsed?.message) {
+        return Array.isArray(parsed.message) ? parsed.message.join(' · ') : parsed.message;
+      }
+    } catch {
+      // el cuerpo no era JSON legible; sigue al mensaje genérico de abajo
+    }
+  }
+
+  return getErrorMessage(err);
+}

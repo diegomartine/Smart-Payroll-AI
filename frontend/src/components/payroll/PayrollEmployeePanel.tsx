@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Plus, Pencil, Trash2, ReceiptText } from 'lucide-react';
+import { Plus, Pencil, Trash2, ReceiptText, FileText } from 'lucide-react';
 import { noveltiesApi } from '../../api/novelties.api';
 import { payrollApi } from '../../api/payroll.api';
 import type {
@@ -10,6 +10,7 @@ import type {
 } from '../../types/payroll.types';
 import { NoveltyFormModal } from './NoveltyFormModal';
 import { PayrollCalculationReceipt } from './PayrollCalculationReceipt';
+import { PayslipModal } from './PayslipModal';
 import { EmptyState } from '../ui/EmptyState';
 import { Loading } from '../ui/Loading';
 import { noveltyTypeLabels, isEarningNovelty } from '../../utils/labels';
@@ -33,6 +34,7 @@ export function PayrollEmployeePanel({ payrollId, payrollEmployee, canEdit }: Pa
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
   const [editingNovelty, setEditingNovelty] = useState<PayrollNovelty | undefined>(undefined);
+  const [payslipOpen, setPayslipOpen] = useState(false);
 
   const employeeId = payrollEmployee.employeeId;
 
@@ -164,7 +166,27 @@ export function PayrollEmployeePanel({ payrollId, payrollEmployee, canEdit }: Pa
         )}
       </div>
 
-      <div>{loading ? <Loading label="Calculando…" /> : calculation && <PayrollCalculationReceipt calculation={calculation} />}</div>
+      <div>
+        {loading ? (
+          <Loading label="Calculando…" />
+        ) : (
+          calculation && (
+            <div className="stack" style={{ gap: 12 }}>
+              <PayrollCalculationReceipt calculation={calculation} />
+              <button
+                className="btn btn-secondary btn-sm w-full"
+                onClick={() => setPayslipOpen(true)}
+              >
+                <FileText size={14} /> Ver desprendible / descargar PDF
+              </button>
+            </div>
+          )
+        )}
+      </div>
+
+      {payslipOpen && (
+        <PayslipModal payrollEmployeeId={payrollEmployee.id} onClose={() => setPayslipOpen(false)} />
+      )}
 
       {modalOpen && (
         <NoveltyFormModal onClose={() => setModalOpen(false)} onSubmit={handleCreate} />

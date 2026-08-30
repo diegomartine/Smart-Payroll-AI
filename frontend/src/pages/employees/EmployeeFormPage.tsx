@@ -1,6 +1,8 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { employeesApi } from '../../api/employees.api';
+import { positionsApi } from '../../api/positions.api';
+import { departmentsApi } from '../../api/departments.api';
 import { PageHeader } from '../../components/ui/PageHeader';
 import { Loading } from '../../components/ui/Loading';
 import type {
@@ -9,6 +11,8 @@ import type {
   Employee,
   EmploymentStatus,
 } from '../../types/employee.types';
+import type { Position } from '../../types/position.types';
+import type { Department } from '../../types/department.types';
 import { documentTypeLabels, employmentStatusLabels } from '../../utils/labels';
 import { getErrorMessage } from '../../utils/errors';
 import { useToast } from '../../hooks/useToast';
@@ -21,8 +25,8 @@ type FormState = {
   lastName: string;
   email: string;
   phone: string;
-  position: string;
-  department: string;
+  positionId: string;
+  departmentId: string;
   baseSalary: string;
   hireDate: string;
   employmentStatus: EmploymentStatus;
@@ -36,8 +40,8 @@ const emptyForm: FormState = {
   lastName: '',
   email: '',
   phone: '',
-  position: '',
-  department: '',
+  positionId: '',
+  departmentId: '',
   baseSalary: '',
   hireDate: '',
   employmentStatus: 'ACTIVE',
@@ -54,8 +58,8 @@ function toFormState(emp: Employee): FormState {
     lastName: emp.lastName,
     email: emp.email ?? '',
     phone: emp.phone ?? '',
-    position: emp.position,
-    department: emp.department,
+    positionId: String(emp.positionId),
+    departmentId: String(emp.departmentId),
     baseSalary: emp.baseSalary,
     hireDate: emp.hireDate.slice(0, 10),
     employmentStatus: emp.employmentStatus,
@@ -71,8 +75,8 @@ function validate(form: FormState): FieldErrors {
   if (form.email.trim() && !/^\S+@\S+\.\S+$/.test(form.email.trim())) {
     errors.email = 'Correo electrónico no válido.';
   }
-  if (!form.position.trim()) errors.position = 'El cargo es obligatorio.';
-  if (!form.department.trim()) errors.department = 'El departamento es obligatorio.';
+  if (!form.positionId) errors.positionId = 'Selecciona un cargo.';
+  if (!form.departmentId) errors.departmentId = 'Selecciona un departamento.';
   const salaryNum = Number(form.baseSalary);
   if (!form.baseSalary || Number.isNaN(salaryNum) || salaryNum <= 0) {
     errors.baseSalary = 'Ingresa un salario base válido, mayor a cero.';
@@ -91,6 +95,20 @@ export function EmployeeFormPage() {
   const [errors, setErrors] = useState<FieldErrors>({});
   const [loading, setLoading] = useState(isEdit);
   const [saving, setSaving] = useState(false);
+
+  const [positions, setPositions] = useState<Position[] | null>(null);
+  const [departments, setDepartments] = useState<Department[] | null>(null);
+
+  // Cargos y departamentos activos para los selectores del formulario.
+  useEffect(() => {
+    Promise.all([positionsApi.listActive(), departmentsApi.listActive()])
+      .then(([pos, dep]) => {
+        setPositions(pos);
+        setDepartments(dep);
+      })
+      .catch((err) => showToast(getErrorMessage(err), 'error'));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (!id) return;
@@ -125,8 +143,8 @@ export function EmployeeFormPage() {
       lastName: form.lastName.trim(),
       email: form.email.trim() || undefined,
       phone: form.phone.trim() || undefined,
-      position: form.position.trim(),
-      department: form.department.trim(),
+      positionId: Number(form.positionId),
+      departmentId: Number(form.departmentId),
       baseSalary: Number(form.baseSalary),
       hireDate: `${form.hireDate}T00:00:00.000Z`,
       employmentStatus: form.employmentStatus,
@@ -264,25 +282,46 @@ export function EmployeeFormPage() {
           </div>
 
           <div className="field">
-            <label htmlFor="position">Cargo</label>
-            <input
-              id="position"
-              className={`input ${errors.position ? 'has-error' : ''}`}
-              value={form.position}
-              onChange={(e) => setField('position', e.target.value)}
-            />
-            {errors.position && <span className="field-error">{errors.position}</span>}
+            <label htmlFor="positionId">Cargo</label>
+            <select
+              id="positionId"
+              className={`input ${errors.positionId ? 'has-error' : ''}`}
+              value={form.positionId}
+              onChange={(e) => setField('positionId', e.target.value)}
+              disabled={!positions}
+            >
+              <option value="">{positions ? 'Selecciona un cargo…' : 'Cargando cargos…'}</option>
+              {positions?.map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.name}
+                </option>
+              ))}
+            </select>
+            {errors.positionId && <span className="field-error">{errors.positionId}</span>}
+            {positions && positions.length === 0 && (
+              <span className="field-hint">
+                No hay cargos activos todavía. Créalos en la sección "Cargos".
+              </span>
+            )}
           </div>
 
           <div className="field">
-            <label htmlFor="department">Departamento</label>
-            <input
-              id="department"
-              className={`input ${errors.department ? 'has-error' : ''}`}
-              value={form.department}
-              onChange={(e) => setField('department', e.target.value)}
-            />
-            {errors.department && <span className="field-error">{errors.department}</span>}
+            <label htmlFor="departmentId">Departamento</label>
+            <select
+              id="departmentId"
+              className={`input ${errors.departmentId ? 'has-error' : ''}`}
+              value={form.departmentId}
+              onChange={(e) => setField('departmentId', e.target.value)}
+              disabled={!departments}
+            >
+              <option value="">{departments ? 'Selecciona un departamento…' : 'Cargando departamentos…'}</option>
+              {departments?.map((d) => (
+                <option key={d.id} value={d.id}>
+                  {d.name}
+                </option>
+              ))}
+            </select>
+            {errors.departmentId && <span className="field-error">{errors.departmentId}</span>}
           </div>
 
           <div className="field">

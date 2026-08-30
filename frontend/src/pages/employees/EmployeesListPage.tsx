@@ -99,8 +99,8 @@ export function EmployeesListPage() {
                     <td className="cell-primary">
                       {emp.firstName} {emp.lastName}
                     </td>
-                    <td className="cell-muted">{emp.position}</td>
-                    <td className="cell-muted">{emp.department}</td>
+                    <td className="cell-muted">{emp.position.name}</td>
+                    <td className="cell-muted">{emp.department.name}</td>
                     <td className="mono">{formatCOP(emp.baseSalary)}</td>
                     <td>
                       <EmploymentStatusBadge status={emp.employmentStatus} />

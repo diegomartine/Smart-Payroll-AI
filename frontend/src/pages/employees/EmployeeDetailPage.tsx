@@ -87,8 +87,8 @@ export function EmployeeDetailPage() {
           </div>
 
           <div className="form-grid">
-            <InfoField icon={<Briefcase size={14} />} label="Cargo" value={employee.position} />
-            <InfoField icon={<Building2 size={14} />} label="Departamento" value={employee.department} />
+            <InfoField icon={<Briefcase size={14} />} label="Cargo" value={employee.position.name} />
+            <InfoField icon={<Building2 size={14} />} label="Departamento" value={employee.department.name} />
             <InfoField
               icon={<Calendar size={14} />}
               label="Fecha de ingreso"

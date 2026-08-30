@@ -4,6 +4,8 @@ import { EmptyState } from '../ui/EmptyState';
 import { employeesApi } from '../../api/employees.api';
 import type { Employee } from '../../types/employee.types';
 import { Users, Search } from 'lucide-react';
+import { getErrorMessage } from '../../utils/errors';
+import { useToast } from '../../hooks/useToast';
 
 interface AddEmployeeModalProps {
   excludeEmployeeIds: number[];
@@ -12,12 +14,17 @@ interface AddEmployeeModalProps {
 }
 
 export function AddEmployeeModal({ excludeEmployeeIds, onClose, onAdd }: AddEmployeeModalProps) {
+  const { showToast } = useToast();
   const [employees, setEmployees] = useState<Employee[] | null>(null);
   const [query, setQuery] = useState('');
   const [addingId, setAddingId] = useState<number | null>(null);
 
   useEffect(() => {
-    employeesApi.list().then(setEmployees);
+    employeesApi
+      .list()
+      .then(setEmployees)
+      .catch((err) => showToast(getErrorMessage(err), 'error'));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const available = useMemo(() => {
@@ -80,7 +87,7 @@ export function AddEmployeeModal({ excludeEmployeeIds, onClose, onAdd }: AddEmpl
                     {e.firstName} {e.lastName}
                   </p>
                   <p className="text-muted mono" style={{ fontSize: 11.5 }}>
-                    {e.employeeCode} · {e.position}
+                    {e.employeeCode} · {e.position.name}
                   </p>
                 </div>
                 <button

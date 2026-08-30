@@ -1,10 +1,13 @@
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, Users, Wallet } from 'lucide-react';
+import { LayoutDashboard, Users, Briefcase, Wallet, FileSpreadsheet, Sparkles } from 'lucide-react';
 
 const links = [
   { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { to: '/employees', label: 'Empleados', icon: Users },
+  { to: '/positions', label: 'Cargos', icon: Briefcase },
   { to: '/payroll', label: 'Nóminas', icon: Wallet },
+  { to: '/imports', label: 'Importar Excel', icon: FileSpreadsheet },
+  { to: '/analysis', label: 'Análisis', icon: Sparkles },
 ];
 
 interface SidebarProps {
