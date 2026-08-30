@@ -51,9 +51,50 @@ export class PayrollService {
       data: updatePayrollDto,
     });
   }
-  remove(id: number): Promise<Payroll> {
-    return this.prisma.payroll.delete({
+  async remove(id: number): Promise<Payroll> {
+    const payroll = await this.prisma.payroll.findUnique({
       where: { id },
+    });
+
+    if (!payroll) {
+      throw new NotFoundException(`Payroll with ID ${id} not found`);
+    }
+
+    return this.prisma.$transaction(async (tx) => {
+      const payrollEmployees = await tx.payrollEmployee.findMany({
+        where: {
+          payrollId: id,
+        },
+        select: {
+          id: true,
+        },
+      });
+
+      const payrollEmployeeIds = payrollEmployees.map(
+        (employee) => employee.id,
+      );
+
+      if (payrollEmployeeIds.length > 0) {
+        await tx.payrollNovelty.deleteMany({
+          where: {
+            payrollEmployeeId: {
+              in: payrollEmployeeIds,
+            },
+          },
+        });
+
+        await tx.payrollEmployee.deleteMany({
+          where: {
+            payrollId: id,
+          },
+        });
+      }
+
+      return tx.payroll.delete({
+        where: {
+          id,
+        },
+      });
     });
   }
   async addEmployee(payrollId: number, employeeId: number) {
