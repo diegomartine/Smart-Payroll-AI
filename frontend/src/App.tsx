@@ -8,6 +8,7 @@ import { PayrollListPage } from './pages/payroll/PayrollListPage';
 import { PayrollFormPage } from './pages/payroll/PayrollFormPage';
 import { PayrollDetailPage } from './pages/payroll/PayrollDetailPage';
 import { PositionsListPage } from './pages/positions/PositionsListPage';
+import { DepartmentsListPage } from './pages/departments/DepartmentsListPage';
 import { ImportEmployeesPage } from './pages/imports/ImportEmployeesPage';
 import { AnalysisPage } from './pages/analysis/AnalysisPage';
 import { NotFoundPage } from './pages/NotFoundPage';
@@ -25,6 +26,7 @@ export function App() {
         <Route path="/employees/:id/edit" element={<EmployeeFormPage />} />
 
         <Route path="/positions" element={<PositionsListPage />} />
+        <Route path="/departments" element={<DepartmentsListPage />} />
 
         <Route path="/payroll" element={<PayrollListPage />} />
         <Route path="/payroll/new" element={<PayrollFormPage />} />

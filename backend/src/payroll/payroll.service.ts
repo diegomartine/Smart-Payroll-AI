@@ -112,7 +112,12 @@ export class PayrollService {
         payrollId,
       },
       include: {
-        employee: true,
+        employee: {
+          include: {
+            position: true,
+            department: true,
+          },
+        },
       },
     });
   }

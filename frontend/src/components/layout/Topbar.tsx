@@ -8,6 +8,7 @@ const sectionNames: Record<string, string> = {
   payroll: 'Nóminas',
   imports: 'Importar Excel',
   analysis: 'Análisis',
+  departments: 'Departamentos',
 };
 
 interface TopbarProps {

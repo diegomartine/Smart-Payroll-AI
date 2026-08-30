@@ -1,8 +1,10 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { Plus } from 'lucide-react';
 import { employeesApi } from '../../api/employees.api';
 import { positionsApi } from '../../api/positions.api';
 import { departmentsApi } from '../../api/departments.api';
+import { DepartmentFormModal } from '../../components/departments/DepartmentFormModal';
 import { PageHeader } from '../../components/ui/PageHeader';
 import { Loading } from '../../components/ui/Loading';
 import type {
@@ -98,14 +100,14 @@ export function EmployeeFormPage() {
 
   const [positions, setPositions] = useState<Position[] | null>(null);
   const [departments, setDepartments] = useState<Department[] | null>(null);
+  const [deptModalOpen, setDeptModalOpen] = useState(false);
+
+  const loadDepartments = () => departmentsApi.listActive().then(setDepartments);
 
   // Cargos y departamentos activos para los selectores del formulario.
   useEffect(() => {
-    Promise.all([positionsApi.listActive(), departmentsApi.listActive()])
-      .then(([pos, dep]) => {
-        setPositions(pos);
-        setDepartments(dep);
-      })
+    Promise.all([positionsApi.listActive(), loadDepartments()])
+      .then(([pos]) => setPositions(pos))
       .catch((err) => showToast(getErrorMessage(err), 'error'));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -127,6 +129,11 @@ export function EmployeeFormPage() {
   const setField = <K extends keyof FormState>(key: K, value: FormState[K]) => {
     setForm((prev) => ({ ...prev, [key]: value }));
     setErrors((prev) => ({ ...prev, [key]: undefined }));
+  };
+
+  const handleDepartmentCreated = async (dept: Department) => {
+    await loadDepartments();
+    setField('departmentId', String(dept.id));
   };
 
   const handleSubmit = async (e: FormEvent) => {
@@ -306,7 +313,19 @@ export function EmployeeFormPage() {
           </div>
 
           <div className="field">
-            <label htmlFor="departmentId">Departamento</label>
+            <div className="flex-between" style={{ marginBottom: 2 }}>
+              <label htmlFor="departmentId" style={{ marginBottom: 0 }}>
+                Departamento
+              </label>
+              <button
+                type="button"
+                className="btn btn-ghost btn-sm"
+                style={{ padding: '2px 8px', fontSize: 12 }}
+                onClick={() => setDeptModalOpen(true)}
+              >
+                <Plus size={13} /> Nuevo departamento
+              </button>
+            </div>
             <select
               id="departmentId"
               className={`input ${errors.departmentId ? 'has-error' : ''}`}
@@ -365,6 +384,14 @@ export function EmployeeFormPage() {
           </button>
         </div>
       </form>
+
+      {deptModalOpen && (
+        <DepartmentFormModal
+          department={null}
+          onClose={() => setDeptModalOpen(false)}
+          onSaved={handleDepartmentCreated}
+        />
+      )}
     </div>
   );
 }

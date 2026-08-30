@@ -260,7 +260,7 @@ export function PayrollDetailPage() {
                     <td className="cell-primary">
                       {pe.employee.firstName} {pe.employee.lastName}
                     </td>
-                    <td className="cell-muted">{pe.employee.position?.name ?? 'Sin cargo'}</td>
+                    <td className="cell-muted">{pe.employee.position.name}</td>
                     <td>
                       <div className="row-actions" onClick={(e) => e.stopPropagation()}>
                         <button

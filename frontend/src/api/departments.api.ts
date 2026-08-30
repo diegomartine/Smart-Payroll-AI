@@ -1,13 +1,27 @@
 import { api } from './axios';
-import type { Department } from '../types/department.types';
+import type {
+  CreateDepartmentPayload,
+  Department,
+  UpdateDepartmentPayload,
+} from '../types/department.types';
 
-/**
- * Solo lectura: se usa para poblar el selector de departamento en el
- * formulario de empleados. El backend sí expone CRUD completo en
- * /departments (igual que /positions), pero esta integración no pidió una
- * página de administración de Departments; ver nota en department.types.ts.
- */
 export const departmentsApi = {
+  list: () => api.get<Department[]>('/departments').then((res) => res.data),
+
   listActive: () =>
     api.get<Department[]>('/departments/active').then((res) => res.data),
+
+  getById: (id: number) =>
+    api.get<Department>(`/departments/${id}`).then((res) => res.data),
+
+  create: (payload: CreateDepartmentPayload) =>
+    api.post<Department>('/departments', payload).then((res) => res.data),
+
+  update: (id: number, payload: UpdateDepartmentPayload) =>
+    api.patch<Department>(`/departments/${id}`, payload).then((res) => res.data),
+
+  deactivate: (id: number) =>
+    api
+      .patch<Department>(`/departments/${id}/deactivate`)
+      .then((res) => res.data),
 };
