@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios from "axios";
 
 /**
  * El backend (NestJS) no tiene CORS habilitado y no debe modificarse.
@@ -7,9 +7,11 @@ import axios from 'axios';
  * Así se respeta "no modificar backend" y aun así funciona `npm run dev`
  * sin bloqueos de CORS.
  */
+const baseURL = import.meta.env.PROD ? import.meta.env.VITE_API_URL : "/api";
+
 export const api = axios.create({
-  baseURL: '/api',
+  baseURL,
   headers: {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   },
 });
